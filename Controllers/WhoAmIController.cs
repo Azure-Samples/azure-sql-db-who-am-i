@@ -95,8 +95,9 @@ namespace Azure.SQL.DB.Samples.Controllers
         public async Task<IActionResult> Impersonate()
         {
             return await RunQuery(async (conn) => {
-                await conn.ExecuteAsync("execute as user = 'web_user' with no revert");
+                var revertCookie = await conn.ExecuteScalarAsync<Byte[]>("declare @c varbinary(8000); execute as user = 'web_user' with cookie into @c; select @c;");
                 var qr = await conn.QuerySingleOrDefaultAsync<string>(_sql);
+                await conn.ExecuteAsync("revert with cookie = @c", new { @c = revertCookie });
                 return JsonDocument.Parse(qr).RootElement;
             });            
         }
