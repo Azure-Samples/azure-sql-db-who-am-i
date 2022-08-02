@@ -110,7 +110,7 @@ namespace Azure.SQL.DB.Samples.Controllers
             if (!string.IsNullOrEmpty(authHeader)) {
                 var authHeaderTokens = authHeader.Split(' ');
                 if (authHeaderTokens.Count() == 2 && authHeaderTokens[0].Trim().ToLower() == "bearer") 
-                    token = authHeaderTokens[1].Trim().ToLower();                                
+                    token = authHeaderTokens[1].Trim();                                
             }
             return await RunQuery(async (conn) => {                
                 var qr = await conn.QuerySingleOrDefaultAsync<string>(_sql);
