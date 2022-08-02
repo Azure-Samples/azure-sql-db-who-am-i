@@ -33,7 +33,7 @@ fi
 echo "Creating Resource Group '$ResourceGroup'...";
 az group create \
     -n $ResourceGroup \
-    -l $location
+    -l $Location
 
 echo "Creating Application Service Plan '$AppName-plan'...";
 az appservice plan create \
