@@ -52,9 +52,13 @@ namespace Azure.SQL.DB.Samples.Controllers
                 using (var conn = new SqlConnection(csb.ConnectionString))
                 {                    
                     if (string.IsNullOrEmpty(csb.UserID)) {
-                        var credential = new Azure.Identity.DefaultAzureCredential();
-                        var accessToken = await credential.GetTokenAsync(new Azure.Core.TokenRequestContext(new[] { "https://database.windows.net/.default" }));
-                        conn.AccessToken = accessToken.Token;
+                        if (string.IsNullOrEmpty(token)) {
+                            var credential = new Azure.Identity.DefaultAzureCredential();
+                            var accessToken = await credential.GetTokenAsync(new Azure.Core.TokenRequestContext(new[] { "https://database.windows.net/.default" }));
+                            conn.AccessToken = accessToken.Token;
+                        } else {
+                            conn.AccessToken = token;
+                        }
                     }
                     await conn.OpenAsync();
                     JsonElement qr = await commandAsync(conn);
