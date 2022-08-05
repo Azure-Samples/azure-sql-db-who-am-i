@@ -1,57 +1,47 @@
-# Project Name
+---
+page_type: sample
+languages:
+- tsql
+- sql
+- aspx-csharp
+products:
+- azure
+- dotnet
+- aspnet
+- dotnet-core
+- aspnet-core
+- azure-api-apps
+- vs-code
+- azure-sql-database
+description: "Connect to Azure SQL Database without using passwords"
+urlFragment: "azure-sql-db-passwordless-connections"
+---
 
-(short, 1-3 sentenced, description of the project)
+# Azure SQL Database Passwordless Connections
 
-## Features
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-This project framework provides the following features:
+<!-- 
+Guidelines on README format: https://review.docs.microsoft.com/help/onboard/admin/samples/concepts/readme-template?branch=master
 
-* Feature 1
-* Feature 2
-* ...
+Guidance on onboarding samples to docs.microsoft.com/samples: https://review.docs.microsoft.com/help/onboard/admin/samples/process/onboarding?branch=master
 
-## Getting Started
+Taxonomies for products and languages: https://review.docs.microsoft.com/new-hope/information-architecture/metadata/taxonomies?branch=master
+-->
 
-### Prerequisites
+Building solutions that can take advtange of Azure SQL Database without the need to worry about passwords is a best practice. Your application we'll be more secure and you don't have to worry about changing and updating password to keep them secure. 
 
-(ideally very short, if any)
+To go passwordless you only need to follow this 5 steps:
 
-- OS
-- Library version
-- ...
+## Create an Application
 
-### Installation
+## Activate the Managed Identity
 
-(ideally very short)
+## Create the database user for the created Managed Identity
 
-- npm install [package name]
-- mvn install
-- ...
+## Assign permissions
 
-### Quickstart
-(Add steps to get up and running quickly)
-
-1. git clone [repository clone url]
-2. cd [repository name]
-3. ...
+## Use Azure.Identity
 
 
-## Demo
 
-A demo app is included to show how to use the project.
-
-To run the demo, follow these steps:
-
-(Add steps to start up the demo)
-
-1.
-2.
-3.
-
-## Resources
-
-(Any additional resources or related projects)
-
-- Link to supporting information
-- Link to similar sample
-- ...
