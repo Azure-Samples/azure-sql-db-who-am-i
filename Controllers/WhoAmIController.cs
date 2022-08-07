@@ -102,6 +102,8 @@ namespace Azure.SQL.DB.Samples.Controllers
             });            
         }
 
+        // Use an existing token, for example from
+        // az account get-access-token --resource "https://database.windows.net"
         [HttpGet]
         [Route("token")]
         public async Task<IActionResult> Token()

@@ -51,6 +51,11 @@ az webapp create \
     --deployment-source-url $gitSource \
     --deployment-source-branch main
 
+echo "Enabling System Managed Identity....";
+az webapp identity assign \
+    -g $ResourceGroup \
+    -n $AppName
+
 echo "Configuring Connection String...";
 az webapp config connection-string set \
     -g $ResourceGroup \
