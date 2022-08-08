@@ -68,7 +68,7 @@ Create an App Service or an Azure Function (the same process will work also for 
 - `Location`: Where the sample will be deployed
 - `ConnectionStrings__AzureSQL`: ADO.NET connection string to your Azure SQL Database
 
-## 2. Activate the Managed
+## 2. Activate the Managed Identity
 
 From the portal go do Settings->Identity in your App Service and enable the Managed Identity you prefer to use: System Assigned or User Assigned. 
 
