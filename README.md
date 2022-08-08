@@ -29,6 +29,19 @@ Guidance on onboarding samples to docs.microsoft.com/samples: https://review.doc
 Taxonomies for products and languages: https://review.docs.microsoft.com/new-hope/information-architecture/metadata/taxonomies?branch=master
 -->
 
+- [Azure SQL Database Passwordless Connections](#azure-sql-database-passwordless-connections)
+  - [Pre-Requisites](#pre-requisites)
+  - [1. Create an Application](#1-create-an-application)
+  - [2. Activate the Managed Identity](#2-activate-the-managed-identity)
+  - [3. Create the database user for the created Managed Identity](#3-create-the-database-user-for-the-created-managed-identity)
+  - [4. Assign permissions](#4-assign-permissions)
+  - [5. Use Azure.Identity](#5-use-azureidentity)
+  - [Testing the sample](#testing-the-sample)
+  - [Bonus Content](#bonus-content)
+    - [Passthrough Authentication](#passthrough-authentication)
+    - [Impersonation](#impersonation)
+    - [Supporting SQL Authentication](#supporting-sql-authentication)
+
 Building solutions that can take advtange of Azure SQL Database without the need to worry about passwords is a best practice. Your application we'll be more secure and you don't have to worry about changing and updating password to keep them secure. 
 
 To go passwordless you only need to follow this 5 steps:
@@ -176,6 +189,8 @@ this is useful if you have a pass-through authentication use case (for example y
 `/impersonate`: Shows how you can impersonate another database user after logging in. This is useful, for example, if you have special security requirements, where some tables are locked down and only some specific dedicated user can access them.
 
 
+### Supporting SQL Authentication
 
+The code in the [`RunQuery`](./Controllers/WhoAmIController.cs) method shows how you can support both SQL Authentication (with login and password) and passwordless authentication (Windows or AAD authentication)
 
 
