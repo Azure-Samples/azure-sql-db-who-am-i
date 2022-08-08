@@ -59,7 +59,7 @@ This is how it will look like at the end of thje process:
 
 ![Azure Portal showing Azure Active Director admin assigned to Azure SQL server](./docs/azure-sql-ad-admin.jpg)
 
-## Create an Application
+## 1. Create an Application
 
 Create an App Service or an Azure Function (the same process will work also for a VM or a Container). You use the `azure-deploy.sh` script to deploy the this sample application to Azure. The first time you'll run the script it will create an `.env` file for you, that you have to fill out to speficy the correct values for your enviroment:
 
@@ -68,7 +68,7 @@ Create an App Service or an Azure Function (the same process will work also for 
 - `Location`: Where the sample will be deployed
 - `ConnectionStrings__AzureSQL`: ADO.NET connection string to your Azure SQL Database
 
-## Activate the Managed
+## 2. Activate the Managed
 
 From the portal go do Settings->Identity in your App Service and enable the Managed Identity you prefer to use: System Assigned or User Assigned. 
 
@@ -80,9 +80,9 @@ From the portal go do Settings->Identity in your App Service and enable the Mana
 Again, the provided `azure-deploy.sh` script will enable the System Assigned Managed Identity.
 
 
-## Create the database user for the created Managed Identity
+## 3. Create the database user for the created Managed Identity
 
-Now that your App Service has a Managed Identity, you need to allow that identity to access to the Azure SQL database you're using. Connect to the Azure SQL database with the tool you prefer and then execute the following commands:
+Now that your App Service has a Managed Identity, you need to allow that identity to access to the Azure SQL database you're using. Connect to the Azure SQL database with the tool you prefer, **make sure you log in using an Azure AD account**, and then execute the following commands:
 
 ```sql
 create user [<app-service-name>] from external provider;
@@ -92,13 +92,14 @@ Replace `<app-service-name` with the same value if you used for `AppName` in the
 
 Perfect! You have just create a **database user**, connected with the Azure Active Directory account used by the App Service.
 
-## Assign permissions
+## 4. Assign permissions
 
 Now the database user need to have the correct permission to work on the database. To make it simple we can give it the permission of a local administrator, meaning that it will be able to do *anything* on the database. 
 
 ```sql
 alter role db_owner add member [<app-service-name>];
 ```
+
 This may be ok for testing and this demo purposes, but is definitely too much for a production enviroment. Make sure to understand how permission work in Azure SQL database, so that you can make sure only the minimum needed permission are given to the App Service account:[Permissions (Database Engine)
 ](https://docs.microsoft.com/en-us/sql/relational-databases/security/permissions-database-engine?view=sql-server-ver16)
 
@@ -115,9 +116,66 @@ while if you want to limit access to a specific table and only for reading, here
 grant select on [<table-name>] to [<app-servivce-name>]
 ```
 
-## Use Azure.Identity
+## 5. Use Azure.Identity
 
 Everything is set up now, so the only remainig work to do is to tell the application that it should connect to Azure SQL DB using the App Service Managed Identity.
 
 Thanks to `Azure.Identity` [library](https://github.com/Azure/azure-sdk-for-net/blob/Azure.Identity_1.6.0/sdk/identity/Azure.Identity/README.md) it is incredibly easy.
+
+Here's a sample code:
+
+```csharp
+using (var conn = new SqlConnection(connectionString))
+{                    
+    var credential = new Azure.Identity.DefaultAzureCredential();
+    var accessToken = await credential.GetTokenAsync(new Azure.Core.TokenRequestContext(new[] { "https://database.windows.net/.default" }));
+    conn.AccessToken = accessToken.Token;
+    await conn.OpenAsync();
+
+    // run sql command
+
+    conn.Close();
+}
+```
+
+All you have to do is get the authentication token via the `GetTokenAsync` method and assign it to the `AccessToken` property. That's all!
+
+Read more and get details on how the DefaultAzureCredential class work to provide the most appropriate identity here: [DefaultAzureCredential](https://github.com/Azure/azure-sdk-for-net/tree/Azure.Identity_1.6.0/sdk/identity/Azure.Identity#defaultazurecredential)
+
+For what concern the sample here, DefaultAzureCredential will work in this way:
+
+- If you are running the sample locally, it will use the login you use to authenticate against Azure using Visual Studio, Visual Studio Code, Azure CLI or PowerShell
+- If you have deployed and you are running the sample on Azure (using the provided `./azure-deploy.sh` script) it will use the defined App Service Managed Identity
+
+## Testing the sample
+
+That's all. No more passwords! If you have deployed the sample on Azure, go to the App Service url (better if you can use a REST client tool like Postman or Insomnia), for example:
+
+```
+https://test-who-am-i.azurewebsites.net/whoami
+```
+
+and you'll see with which account the App Service is logging in into Azure SQL database.
+
+## Bonus Content
+
+The code in `WhoAmIController.cs` file contains two more endpoints:
+
+### Passthrough Authentication
+
+`/token`: That will use the Bearer token passed in the HTTP header to login in into Azure SQL DB. You can get the token for your account using AZ CLI: 
+
+```shell
+az account get-access-token --resource "https://database.windows.net"
+```
+
+this is useful if you have a pass-through authentication use case (for example you-re building an intranet website)
+
+### Impersonation
+
+`/impersonate`: Shows how you can impersonate another database user after logging in. This is useful, for example, if you have special security requirements, where some tables are locked down and only some specific dedicated user can access them.
+
+
+
+
 
