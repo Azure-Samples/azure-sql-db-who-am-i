@@ -103,7 +103,7 @@ alter role db_owner add member [<app-service-name>];
 This may be ok for testing and this demo purposes, but is definitely too much for a production enviroment. Make sure to understand how permission work in Azure SQL database, so that you can make sure only the minimum needed permission are given to the App Service account:[Permissions (Database Engine)
 ](https://docs.microsoft.com/en-us/sql/relational-databases/security/permissions-database-engine?view=sql-server-ver16)
 
-For example if you want to give permission to read and write from all tables in a database (but not modify their structure) you can use [*database roles*](https://docs.microsoft.com/en-us/sql/relational-databases/security/authentication-access/database-level-roles):
+For example if you want to give permission to read and write from all tables in a database (but not modify their structure) you can use [*database roles*](https://docs.microsoft.com/en-us/sql/relational-databases/security/authentication-access/database-level-roles), instead of making the database user part of the `db_owener` role you can do the following:
 
 ```sql
 alter role db_datareader add member [<app-service-name>];
