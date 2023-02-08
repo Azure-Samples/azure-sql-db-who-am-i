@@ -32,7 +32,7 @@ namespace Azure.SQL.DB.Samples.Controllers
                     for json auto
                     )) as userData                
             from
-                (values(1)) t(c) for json auto
+                (values(1)) t(c) for json auto, without_array_wrapper
         ";
 
         private readonly ILogger<WhoAmIController> _logger;
@@ -48,23 +48,27 @@ namespace Azure.SQL.DB.Samples.Controllers
         {
             try
             {
-                var csb = new SqlConnectionStringBuilder(_config.GetConnectionString("AzureSQL"));                
+                var csb = new SqlConnectionStringBuilder(_config.GetConnectionString("AzureSQL"));  
+
+                if (csb.Authentication == SqlAuthenticationMethod.NotSpecified && string.IsNullOrEmpty(token))
+                    csb.Authentication = SqlAuthenticationMethod.ActiveDirectoryDefault;                        
+
                 using (var conn = new SqlConnection(csb.ConnectionString))
                 {                    
-                    if (string.IsNullOrEmpty(csb.UserID)) {
-                        if (string.IsNullOrEmpty(token)) {
-                            var credential = new Azure.Identity.DefaultAzureCredential();
-                            var accessToken = await credential.GetTokenAsync(new Azure.Core.TokenRequestContext(new[] { "https://database.windows.net/.default" }));
-                            conn.AccessToken = accessToken.Token;
-                        } else {
-                            conn.AccessToken = token;
-                        }
-                    }
+                    if (csb.Authentication == SqlAuthenticationMethod.NotSpecified && !string.IsNullOrEmpty(token))
+                        conn.AccessToken = token;
+
                     await conn.OpenAsync();
                     JsonElement qr = await commandAsync(conn);
                     conn.Close();
 
-                    return Ok(qr);
+                    var result = new
+                    {
+                        authentication_type = Enum.GetName(typeof(SqlAuthenticationMethod), csb.Authentication),
+                        qr
+                    };               
+
+                    return Ok(result);
                 }
             }
             catch (Exception e)
