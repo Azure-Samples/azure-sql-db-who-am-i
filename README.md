@@ -35,7 +35,7 @@ Taxonomies for products and languages: https://review.docs.microsoft.com/new-hop
   - [2. Activate the Managed Identity](#2-activate-the-managed-identity)
   - [3. Create the database user for the created Managed Identity](#3-create-the-database-user-for-the-created-managed-identity)
   - [4. Assign permissions](#4-assign-permissions)
-  - [5. Use Azure.Identity](#5-use-azureidentity)
+  - [5. Set the Connection String](#5-set-the-connection-string)
   - [Testing the sample](#testing-the-sample)
   - [Bonus Content](#bonus-content)
     - [Passthrough Authentication](#passthrough-authentication)
@@ -89,7 +89,6 @@ From the portal go do Settings->Identity in your App Service and enable the Mana
 
 ![Azure Portal showing Managed Service Identity enabled for a sample App Service](./docs/azure-app-service-msi.jpg)
 
-
 Again, the provided `azure-deploy.sh` script will enable the System Assigned Managed Identity.
 
 
@@ -129,20 +128,21 @@ while if you want to limit access to a specific table and only for reading, here
 grant select on [<table-name>] to [<app-servivce-name>]
 ```
 
-## 5. Use Azure.Identity
+## 5. Set the Connection String
 
 Everything is set up now, so the only remainig work to do is to tell the application that it should connect to Azure SQL DB using the App Service Managed Identity.
 
-Thanks to `Azure.Identity` [library](https://github.com/Azure/azure-sdk-for-net/blob/Azure.Identity_1.6.0/sdk/identity/Azure.Identity/README.md) it is incredibly easy.
+Thanks to latest update to the [Microsoft.Data.SqlClient](https://www.nuget.org/packages/Microsoft.Data.SqlClient/) library, you can now use the Managed Identity to connect to Azure SQL DB without the need to specify any password.
+
+The easist way to have everything working is to use the [Active Directory Default authentication](https://learn.microsoft.com/en-us/sql/connect/ado-net/sql/azure-active-directory-authentication?view=sql-server-ver16#using-active-directory-default-authentication)
 
 Here's a sample code:
 
 ```csharp
+// Use your own server, database
+string ConnectionString = @"Server=demo.database.windows.net; Authentication=Active Directory Default; Encrypt=True; Database=testdb;";
 using (var conn = new SqlConnection(connectionString))
 {                    
-    var credential = new Azure.Identity.DefaultAzureCredential();
-    var accessToken = await credential.GetTokenAsync(new Azure.Core.TokenRequestContext(new[] { "https://database.windows.net/.default" }));
-    conn.AccessToken = accessToken.Token;
     await conn.OpenAsync();
 
     // run sql command
@@ -151,14 +151,12 @@ using (var conn = new SqlConnection(connectionString))
 }
 ```
 
-All you have to do is get the authentication token via the `GetTokenAsync` method and assign it to the `AccessToken` property. That's all!
-
-Read more and get details on how the DefaultAzureCredential class work to provide the most appropriate identity here: [DefaultAzureCredential](https://github.com/Azure/azure-sdk-for-net/tree/Azure.Identity_1.6.0/sdk/identity/Azure.Identity#defaultazurecredential)
-
-For what concern the sample here, DefaultAzureCredential will work in this way:
+The Active Directory Default authentication work in this way:
 
 - If you are running the sample locally, it will use the login you use to authenticate against Azure using Visual Studio, Visual Studio Code, Azure CLI or PowerShell
 - If you have deployed and you are running the sample on Azure (using the provided `./azure-deploy.sh` script) it will use the defined App Service Managed Identity
+
+Super easy and secure!
 
 ## Testing the sample
 
@@ -188,9 +186,5 @@ this is useful if you have a pass-through authentication use case (for example y
 
 `/impersonate`: Shows how you can impersonate another database user after logging in. This is useful, for example, if you have special security requirements, where some tables are locked down and only some specific dedicated user can access them.
 
-
-### Supporting SQL Authentication
-
-The code in the [`RunQuery`](./Controllers/WhoAmIController.cs) method shows how you can support both SQL Authentication (with login and password) and passwordless authentication (Windows or AAD authentication)
 
 
