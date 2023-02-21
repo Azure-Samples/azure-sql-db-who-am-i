@@ -3,15 +3,9 @@ page_type: sample
 languages:
 - tsql
 - sql
-- aspx-csharp
 products:
-- azure
-- dotnet
-- aspnet
 - dotnet-core
 - aspnet-core
-- azure-api-apps
-- vs-code
 - azure-sql-database
 description: "Connect to Azure SQL Database without using passwords"
 urlFragment: "azure-sql-db-passwordless-connections"
