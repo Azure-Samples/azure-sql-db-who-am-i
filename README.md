@@ -119,7 +119,7 @@ alter role db_datawriter add member [<app-service-name>];
 while if you want to limit access to a specific table and only for reading, here's an example:
 
 ```sql
-grant select on [<table-name>] to [<app-servivce-name>]
+grant select on [<table-name>] to [<app-service-name>]
 ```
 
 ## 5. Set the Connection String
