@@ -50,7 +50,7 @@ Make sure that you have assigned an Azure Active Directory user as the Azure SQL
 
 Using CLI, for example, if you want to associate your account as the Azure SQL administrator:
 
-Get the user Object Id for your account
+Get the user Object Id for your account (using AZ CLI and Ubuntu)
 
 ```shell
 uid=`az ad user show --id <ad-account-email> --query "id" -o tsv`; echo $uid
@@ -96,7 +96,7 @@ create user [<app-service-name>] from external provider;
 
 Replace `<app-service-name` with the same value if you used for `AppName` in the `.env` file.
 
-Perfect! You have just create a **database user**, connected with the Azure Active Directory account used by the App Service.
+Perfect! You have just created a **database user**, connected with the Azure Active Directory account used by the App Service.
 
 ## 4. Assign permissions
 
