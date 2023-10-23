@@ -4,7 +4,7 @@ languages:
 - tsql
 - sql
 products:
-- dotnet-core
+- dotnet
 - aspnet-core
 - azure-sql-database
 description: "Connect to Azure SQL Database without using passwords"
