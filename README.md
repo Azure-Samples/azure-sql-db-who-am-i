@@ -62,13 +62,13 @@ the make the user the Azure SQL server admin:
 az sql server ad-admin create -i $uid -u <ad-account-email> -g <resource-group> -s <azure-sql-server>.database.windows.net
 ```
 
-This is how it will look like at the end of thje process:
+This is how it will look like at the end of the process:
 
 ![Azure Portal showing Azure Active Director admin assigned to Azure SQL server](./docs/azure-sql-ad-admin.jpg)
 
 ## 1. Create an Application
 
-Create an App Service or an Azure Function (the same process will work also for a VM or a Container). You use the `azure-deploy.sh` script to deploy the this sample application to Azure. The first time you'll run the script it will create an `.env` file for you, that you have to fill out to speficy the correct values for your enviroment:
+Create an App Service or an Azure Function (the same process will work also for a VM or a Container). You use the `azure-deploy.sh` script to deploy the this sample application to Azure. The first time you run the script it will create an `.env` file for you, that you have to fill out to specify the correct values for your environment:
 
 - `ResourceGroup`: Name of the resource group that you want to use (a new one will be automatically created if the specified Resource Group does not exist
 - `AppName`: Name of the App Service that will be created
@@ -77,7 +77,7 @@ Create an App Service or an Azure Function (the same process will work also for 
 
 ## 2. Activate the Managed Identity
 
-From the portal go do Settings->Identity in your App Service and enable the Managed Identity you prefer to use: System Assigned or User Assigned. 
+From the portal go to Settings->Identity in your App Service and enable the Managed Identity you prefer to use: System Assigned or User Assigned. 
 
 **Important**: A System Assigned Managed Identity will have the *same name* of the App Service (or the service you are using)
 
@@ -106,10 +106,10 @@ Now the database user need to have the correct permission to work on the databas
 alter role db_owner add member [<app-service-name>];
 ```
 
-This may be ok for testing and this demo purposes, but is definitely too much for a production enviroment. Make sure to understand how permission work in Azure SQL database, so that you can make sure only the minimum needed permission are given to the App Service account:[Permissions (Database Engine)
+This may be ok for testing and this demo purposes, but is definitely too much for a production enviroment. Make sure to understand how permissions work in Azure SQL database, so that you can make sure only the minimum needed permissions are given to the App Service account:[Permissions (Database Engine)
 ](https://docs.microsoft.com/en-us/sql/relational-databases/security/permissions-database-engine?view=sql-server-ver16)
 
-For example if you want to give permission to read and write from all tables in a database (but not modify their structure) you can use [*database roles*](https://docs.microsoft.com/en-us/sql/relational-databases/security/authentication-access/database-level-roles), instead of making the database user part of the `db_owener` role you can do the following:
+For example if you want to give permission to read and write from all tables in a database (but not modify their structure) you can use [*database roles*](https://docs.microsoft.com/en-us/sql/relational-databases/security/authentication-access/database-level-roles), instead of making the database user part of the `db_owner` role you can do the following:
 
 ```sql
 alter role db_datareader add member [<app-service-name>];
@@ -119,12 +119,12 @@ alter role db_datawriter add member [<app-service-name>];
 while if you want to limit access to a specific table and only for reading, here's an example:
 
 ```sql
-grant select on [<table-name>] to [<app-servivce-name>]
+grant select on [<table-name>] to [<app-service-name>]
 ```
 
 ## 5. Set the Connection String
 
-Everything is set up now, so the only remainig work to do is to tell the application that it should connect to Azure SQL DB using the App Service Managed Identity.
+Everything is set up now, so the only remaining work to do is to tell the application that it should connect to Azure SQL DB using the App Service Managed Identity.
 
 Thanks to latest update to the [Microsoft.Data.SqlClient](https://www.nuget.org/packages/Microsoft.Data.SqlClient/) library, you can now use the Managed Identity to connect to Azure SQL DB without the need to specify any password.
 
@@ -145,7 +145,7 @@ using (var conn = new SqlConnection(connectionString))
 }
 ```
 
-The Active Directory Default authentication work in this way:
+The Active Directory Default authentication works in this way:
 
 - If you are running the sample locally, it will use the login you use to authenticate against Azure using Visual Studio, Visual Studio Code, Azure CLI or PowerShell
 - If you have deployed and you are running the sample on Azure (using the provided `./azure-deploy.sh` script) it will use the defined App Service Managed Identity
@@ -174,7 +174,7 @@ The code in `WhoAmIController.cs` file contains two more endpoints:
 az account get-access-token --resource "https://database.windows.net"
 ```
 
-this is useful if you have a pass-through authentication use case (for example you-re building an intranet website)
+this is useful if you have a pass-through authentication use case (for example you're building an intranet website)
 
 ### Impersonation
 
