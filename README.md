@@ -154,7 +154,7 @@ Super easy and secure!
 
 ## Testing the sample
 
-That's all. No more passwords! If you have deployed the sample on Azure, go to the App Service url (better if you can use a REST client tool like Postman or Insomnia), for example:
+That's all. No more passwords! If you have deployed the sample on Azure, go to the App Service url (better if you can use a REST client tool such as [Visual Studio](https://learn.microsoft.com/aspnet/core/test/http-files), [Insomnia](https://insomnia.rest/), [Curl](https://curl.se/docs/httpscripting.html) or PowerShell's [Invoke-RestMethod](https://learn.microsoft.com/powershell/module/microsoft.powershell.utility/invoke-restmethod)), for example:
 
 ```
 https://test-who-am-i.azurewebsites.net/whoami
